@@ -62,7 +62,7 @@ public class PullToRefreshRecyclerView extends PullToRefreshBase<RecyclerView> {
             return true;
         int firstVisiblePosition = mRefreshableView.getChildPosition(mRefreshableView.getChildAt(0));
         if (firstVisiblePosition == 0)
-            return mRefreshableView.getChildAt(0).getTop() == 0;
+            return mRefreshableView.getChildAt(0).getTop() == mRefreshableView.getPaddingTop();
         else
             return false;
 
