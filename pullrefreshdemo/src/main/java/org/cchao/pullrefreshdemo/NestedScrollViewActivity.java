@@ -81,7 +81,7 @@ public class NestedScrollViewActivity extends AppCompatActivity {
             rvData.setNestedScrollingEnabled(false);
             adapter = new DataAdapter(data);
             rvData.setAdapter(adapter);
-            adapter.setOnItemClickListener(position -> Toast.makeText(NestedScrollViewActivity.this, data.get(position), Toast.LENGTH_SHORT).show());
+            adapter.setOnItemClickListener(position -> Toast.makeText(this, data.get(position), Toast.LENGTH_SHORT).show());
         } else {
             adapter.notifyDataSetChanged();
         }

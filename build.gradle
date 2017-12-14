@@ -29,6 +29,4 @@ ext {
     targetSdk = 26
     //App dependencies
     supportLibraryVersion = '27.0.2'
-    butterKnifeVersion = '8.8.1'
-    retrofitVersion = '2.0.2'
 }

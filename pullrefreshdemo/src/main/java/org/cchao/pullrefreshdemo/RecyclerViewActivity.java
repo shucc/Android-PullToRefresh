@@ -78,7 +78,7 @@ public class RecyclerViewActivity extends AppCompatActivity {
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
             adapter = new DataAdapter(data);
             recyclerView.setAdapter(adapter);
-            adapter.setOnItemClickListener(position -> Toast.makeText(RecyclerViewActivity.this, data.get(position), Toast.LENGTH_SHORT).show());
+            adapter.setOnItemClickListener(position -> Toast.makeText(this, data.get(position), Toast.LENGTH_SHORT).show());
         } else {
             adapter.notifyDataSetChanged();
         }

@@ -43,6 +43,7 @@ import com.handmark.pulltorefresh.library.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 @SuppressLint("ViewConstructor")
 public abstract class LoadingLayout extends FrameLayout implements ILoadingLayout {
@@ -54,7 +55,7 @@ public abstract class LoadingLayout extends FrameLayout implements ILoadingLayou
 
     static final Interpolator ANIMATION_INTERPOLATOR = new LinearInterpolator();
 
-    private static SimpleDateFormat mDataFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static SimpleDateFormat mDataFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
 
     private RelativeLayout mInnerLayout;
 
@@ -84,11 +85,11 @@ public abstract class LoadingLayout extends FrameLayout implements ILoadingLayou
         mMode = mode;
         LayoutInflater.from(context).inflate(R.layout.pull_to_refresh_header_vertical, this);
 
-        mInnerLayout = (RelativeLayout) findViewById(R.id.rl_inner);
-        mHeaderText = (TextView) mInnerLayout.findViewById(R.id.pull_to_refresh_text);
-        mHeaderProgress = (ProgressBar) mInnerLayout.findViewById(R.id.pull_to_refresh_progress);
-        mSubHeaderText = (TextView) mInnerLayout.findViewById(R.id.pull_to_refresh_sub_text);
-        mHeaderImage = (ImageView) mInnerLayout.findViewById(R.id.pull_to_refresh_image);
+        mInnerLayout = findViewById(R.id.rl_inner);
+        mHeaderText = mInnerLayout.findViewById(R.id.pull_to_refresh_text);
+        mHeaderProgress = mInnerLayout.findViewById(R.id.pull_to_refresh_progress);
+        mSubHeaderText = mInnerLayout.findViewById(R.id.pull_to_refresh_sub_text);
+        mHeaderImage = mInnerLayout.findViewById(R.id.pull_to_refresh_image);
 
         FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) mInnerLayout.getLayoutParams();
 
@@ -114,7 +115,7 @@ public abstract class LoadingLayout extends FrameLayout implements ILoadingLayou
         if (attrs.hasValue(R.styleable.PullToRefresh_ptrHeaderBackground)) {
             Drawable background = attrs.getDrawable(R.styleable.PullToRefresh_ptrHeaderBackground);
             if (null != background) {
-                ViewCompat.setBackground(this, background);
+                setBackground(background);
             }
         }
 
@@ -174,13 +175,13 @@ public abstract class LoadingLayout extends FrameLayout implements ILoadingLayou
     }
 
     public final void setHeight(int height) {
-        ViewGroup.LayoutParams lp = (ViewGroup.LayoutParams) getLayoutParams();
+        ViewGroup.LayoutParams lp = getLayoutParams();
         lp.height = height;
         requestLayout();
     }
 
     public final void setWidth(int width) {
-        ViewGroup.LayoutParams lp = (ViewGroup.LayoutParams) getLayoutParams();
+        ViewGroup.LayoutParams lp = getLayoutParams();
         lp.width = width;
         requestLayout();
     }
@@ -254,7 +255,6 @@ public abstract class LoadingLayout extends FrameLayout implements ILoadingLayou
         if (null != mHeaderText) {
             mHeaderText.setText(mReleaseLabel);
         }
-
         // Now call the callback
         releaseToRefreshImpl();
     }

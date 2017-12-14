@@ -18,8 +18,6 @@ package com.handmark.pulltorefresh.library;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
@@ -36,8 +34,6 @@ import android.widget.LinearLayout;
 
 import com.handmark.pulltorefresh.library.internal.FlipLoadingLayout;
 import com.handmark.pulltorefresh.library.internal.LoadingLayout;
-import com.handmark.pulltorefresh.library.internal.Utils;
-import com.handmark.pulltorefresh.library.internal.ViewCompat;
 
 public abstract class PullToRefreshBase<T extends View> extends LinearLayout implements IPullToRefresh<T> {
 
@@ -200,8 +196,7 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
 
     @Override
     public final boolean isPullToRefreshOverScrollEnabled() {
-        return VERSION.SDK_INT >= VERSION_CODES.GINGERBREAD && mOverScrollEnabled
-                && OverscrollHelper.isAndroidOverScrollEnabled(mRefreshableView);
+        return mOverScrollEnabled && OverScrollHelper.isAndroidOverScrollEnabled(mRefreshableView);
     }
 
     @Override
@@ -312,7 +307,6 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
                 }
                 break;
             }
-
             case MotionEvent.ACTION_DOWN: {
                 if (isReadyForPull()) {
                     mLastMotionY = mInitialMotionY = event.getY();
@@ -321,7 +315,6 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
                 }
                 break;
             }
-
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP: {
                 if (mIsBeingDragged) {
@@ -342,7 +335,6 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
                     // If we haven't returned by here, then we're not in a state
                     // to pull, so just reset
                     setState(State.RESET);
-
                     return true;
                 }
                 break;
@@ -908,13 +900,7 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
         }
 
         if (USE_HW_LAYERS) {
-            /**
-             * Use a Hardware Layer on the Refreshable View if we've scrolled at
-             * all. We don't use them on the Header/Footer Views as they change
-             * often, which would negate any HW layer performance boost.
-             */
-            ViewCompat.setLayerType(mRefreshableViewWrapper, value != 0 ? View.LAYER_TYPE_HARDWARE
-                    : View.LAYER_TYPE_NONE);
+            mRefreshableViewWrapper.setLayerType(value != 0 ? View.LAYER_TYPE_HARDWARE : View.LAYER_TYPE_NONE, null);
         }
         scrollTo(0, value);
     }
@@ -1041,7 +1027,6 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
                 mRefreshableView.setBackgroundDrawable(background);
             }
         } else if (a.hasValue(R.styleable.PullToRefresh_ptrAdapterViewBackground)) {
-            Utils.warnDeprecation("ptrAdapterViewBackground", "ptrRefreshableViewBackground");
             Drawable background = a.getDrawable(R.styleable.PullToRefresh_ptrAdapterViewBackground);
             if (null != background) {
                 mRefreshableView.setBackgroundDrawable(background);
@@ -1283,31 +1268,10 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
 
     }
 
-    // ===========================================================
-    // Inner, Anonymous Classes, and Enumerations
-    // ===========================================================
-
-    /**
-     * Simple Listener that allows you to be notified when the user has scrolled
-     * to the end of the AdapterView. See (
-     * {@link PullToRefreshAdapterViewBase#setOnLastItemVisibleListener}.
-     *
-     * @author Chris Banes
-     */
-    public interface OnLastItemVisibleListener {
-
-        /**
-         * Called when the user has scrolled to the end of the list
-         */
-        void onLastItemVisible();
-
-    }
-
     /**
      * Listener that allows you to be notified when the user has started or
      * finished a touch event. Useful when you want to append extra UI events
      * (such as sounds). See (
-     * {@link PullToRefreshAdapterViewBase#setOnPullEventListener}.
      *
      * @author Chris Banes
      */
@@ -1479,7 +1443,7 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
 
             // If we're not at the target Y, keep going...
             if (mContinueRunning && mScrollToY != mCurrentY) {
-                ViewCompat.postOnAnimation(PullToRefreshBase.this, this);
+                postOnAnimation(this);
             } else {
                 if (null != mListener) {
                     mListener.onSmoothScrollFinished();
