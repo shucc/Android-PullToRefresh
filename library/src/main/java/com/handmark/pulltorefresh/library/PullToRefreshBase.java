@@ -21,7 +21,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -36,11 +35,7 @@ import com.handmark.pulltorefresh.library.internal.LoadingLayout;
 
 public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
 
-    private final boolean DEBUG = BuildConfig.DEBUG;
-
     private final boolean USE_HW_LAYERS = false;
-
-    private final String LOG_TAG = "PullToRefresh";
 
     private final float FRICTION = 2.0f;
 
@@ -103,9 +98,6 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
 
     @Override
     public void addView(View child, int index, ViewGroup.LayoutParams params) {
-        if (DEBUG) {
-            Log.d(LOG_TAG, "addView: " + child.getClass().getSimpleName());
-        }
 
         final T refreshableView = getRefreshableView();
 
@@ -319,9 +311,6 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
 
     public final void setMode(Mode mode) {
         if (mode != mMode) {
-            if (DEBUG) {
-                Log.d(LOG_TAG, "Setting mode to: " + mode);
-            }
             mMode = mode;
             updateUIForMode();
         }
@@ -374,10 +363,6 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
 
     final void setState(State state, final boolean... params) {
         mState = state;
-        if (DEBUG) {
-            Log.d(LOG_TAG, "State: " + mState.name());
-        }
-
         switch (mState) {
             case RESET:
                 onReset();
@@ -419,10 +404,26 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
         super.addView(child, -1, params);
     }
 
-    protected ILoadingLayout createLoadingLayout(Context context, Mode mode, TypedArray attrs) {
-        ILoadingLayout layout = new LoadingLayout(context, mode, attrs);
-        layout.setVisibility(View.INVISIBLE);
-        return layout;
+    /**
+     * 创建顶部下拉刷新View
+     *
+     * @param context
+     * @param attrs
+     * @return
+     */
+    public ILoadingLayout createHeaderLoadingLayout(Context context, TypedArray attrs) {
+        return new LoadingLayout(context, Mode.PULL_FROM_START, attrs);
+    }
+
+    /**
+     * 创建底部上拉加载刷新View
+     *
+     * @param context
+     * @param attrs
+     * @return
+     */
+    public ILoadingLayout createFooterLoadingLayout(Context context, TypedArray attrs) {
+        return new LoadingLayout(context, Mode.PULL_FROM_END, attrs);
     }
 
     /**
@@ -660,10 +661,6 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
 
     @Override
     protected final void onSizeChanged(int w, int h, int oldw, int oldh) {
-        if (DEBUG) {
-            Log.d(LOG_TAG, String.format("onSizeChanged. W: %d, H: %d", w, h));
-        }
-
         super.onSizeChanged(w, h, oldw, oldh);
 
         // We need to update the header/footer when our size changes
@@ -709,10 +706,6 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
         } else {
             pBottom = 0;
         }
-
-        if (DEBUG) {
-            Log.d(LOG_TAG, String.format("Setting Padding. L: %d, T: %d, R: %d, B: %d", pLeft, pTop, pRight, pBottom));
-        }
         setPadding(pLeft, pTop, pRight, pBottom);
     }
 
@@ -733,10 +726,6 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
      * @param value - New Scroll value
      */
     protected final void setHeaderScroll(int value) {
-        if (DEBUG) {
-            Log.d(LOG_TAG, "setHeaderScroll: " + value);
-        }
-
         // Clamp value to with pull scroll range
         final int maximumPullScroll = getMaximumPullScroll();
         value = Math.min(maximumPullScroll, Math.max(-maximumPullScroll, value));
@@ -868,8 +857,8 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
         addRefreshableView(context, mRefreshableView);
 
         // We need to create now layouts now
-        mHeaderLayout = createLoadingLayout(context, Mode.PULL_FROM_START, a);
-        mFooterLayout = createLoadingLayout(context, Mode.PULL_FROM_END, a);
+        mHeaderLayout = createHeaderLoadingLayout(context, a);
+        mFooterLayout = createFooterLoadingLayout(context, a);
 
         /**
          * Styleables from XML

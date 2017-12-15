@@ -21,10 +21,10 @@ import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Matrix;
-import android.graphics.Typeface;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -51,7 +51,7 @@ import java.util.Locale;
 @SuppressLint("ViewConstructor")
 public class LoadingLayout extends ILoadingLayout {
 
-    static final String LOG_TAG = "PullToRefresh-LoadingLayout";
+    private final String TAG = "LoadingLayout";
 
     private final static String KEY_LAST_UPDATE_TIME_SP = "ptr_last_update";
     private final static String KEY_LAST_UPDATE_TIME = "last_update_time";
@@ -60,19 +60,19 @@ public class LoadingLayout extends ILoadingLayout {
 
     private final Interpolator ANIMATION_INTERPOLATOR = new LinearInterpolator();
 
-    private static SimpleDateFormat mDataFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
+    private SimpleDateFormat mDataFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
 
     private RelativeLayout mInnerLayout;
 
-    protected final ImageView mHeaderImage;
-    protected final ProgressBar mHeaderProgress;
+    private final ImageView mHeaderImage;
+    private final ProgressBar mHeaderProgress;
 
     private boolean mUseIntrinsicAnimation;
 
     private final TextView mHeaderText;
     private final TextView mSubHeaderText;
 
-    protected final Mode mMode;
+    private final Mode mMode;
 
     private CharSequence mPullLabel;
     private CharSequence mRefreshingLabel;
@@ -99,10 +99,7 @@ public class LoadingLayout extends ILoadingLayout {
         mSubHeaderText = mInnerLayout.findViewById(R.id.pull_to_refresh_sub_text);
         mHeaderImage = mInnerLayout.findViewById(R.id.pull_to_refresh_image);
 
-        FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) mInnerLayout.getLayoutParams();
-
         final int rotateAngle = mode == Mode.PULL_FROM_START ? -180 : 180;
-
         mRotateAnimation = new RotateAnimation(0, rotateAngle, Animation.RELATIVE_TO_SELF, 0.5f,
                 Animation.RELATIVE_TO_SELF, 0.5f);
         mRotateAnimation.setInterpolator(ANIMATION_INTERPOLATOR);
@@ -114,6 +111,8 @@ public class LoadingLayout extends ILoadingLayout {
         mResetRotateAnimation.setInterpolator(ANIMATION_INTERPOLATOR);
         mResetRotateAnimation.setDuration(FLIP_ANIMATION_DURATION);
         mResetRotateAnimation.setFillAfter(true);
+
+        FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) mInnerLayout.getLayoutParams();
 
         switch (mode) {
             case PULL_FROM_END:
@@ -198,18 +197,21 @@ public class LoadingLayout extends ILoadingLayout {
 
     @Override
     public int getContentSize() {
+        Log.d(TAG, "getContentSize: ");
         return mInnerLayout.getHeight();
     }
 
     @Override
     public final void onPull(float scaleOfLayout) {
+        Log.d(TAG, "onPull: " + scaleOfLayout);
         if (!mUseIntrinsicAnimation) {
-            onPullImpl(scaleOfLayout);
+
         }
     }
 
     @Override
     public final void pullToRefresh() {
+        Log.d(TAG, "pullToRefresh: ");
         if (null != mHeaderText) {
             mHeaderText.setText(mPullLabel);
         }
@@ -222,12 +224,14 @@ public class LoadingLayout extends ILoadingLayout {
                 mSubHeaderText.setVisibility(GONE);
             }
         }
-        // Now call the callback
-        pullToRefreshImpl();
+        if (mRotateAnimation == mHeaderImage.getAnimation()) {
+            mHeaderImage.startAnimation(mResetRotateAnimation);
+        }
     }
 
     @Override
     public final void refreshing() {
+        Log.d(TAG, "refreshing: ");
         if (null != mHeaderText) {
             mHeaderText.setText(mRefreshingLabel);
         }
@@ -236,7 +240,9 @@ public class LoadingLayout extends ILoadingLayout {
             ((AnimationDrawable) mHeaderImage.getDrawable()).start();
         } else {
             // Now call the callback
-            refreshingImpl();
+            mHeaderImage.clearAnimation();
+            mHeaderImage.setVisibility(View.INVISIBLE);
+            mHeaderProgress.setVisibility(View.VISIBLE);
         }
 
         if (null != mSubHeaderText) {
@@ -252,15 +258,17 @@ public class LoadingLayout extends ILoadingLayout {
 
     @Override
     public final void releaseToRefresh() {
+        Log.d(TAG, "releaseToRefresh: ");
         if (null != mHeaderText) {
             mHeaderText.setText(mReleaseLabel);
         }
         // Now call the callback
-        releaseToRefreshImpl();
+        mHeaderImage.startAnimation(mRotateAnimation);
     }
 
     @Override
     public final void reset() {
+        Log.d(TAG, "reset: ");
         if (null != mHeaderText) {
             mHeaderText.setText(mRefreshComplete);
         }
@@ -268,13 +276,13 @@ public class LoadingLayout extends ILoadingLayout {
         if (mUseIntrinsicAnimation) {
             ((AnimationDrawable) mHeaderImage.getDrawable()).stop();
         } else {
-            // Now call the callback
-            resetImpl();
+            mHeaderImage.clearAnimation();
+            mHeaderProgress.setVisibility(View.GONE);
+            mHeaderImage.setVisibility(View.VISIBLE);
         }
     }
 
     private String getLastUpdateTime() {
-
         if (mLastUpdateTime == -1) {
             mLastUpdateTime = getContext().getSharedPreferences(KEY_LAST_UPDATE_TIME_SP, 0).getLong(KEY_LAST_UPDATE_TIME, -1);
         }
@@ -296,36 +304,6 @@ public class LoadingLayout extends ILoadingLayout {
         onLoadingDrawableSet(imageDrawable);
     }
 
-    public void setPullLabel(CharSequence pullLabel) {
-        mPullLabel = pullLabel;
-    }
-
-    public void setRefreshingLabel(CharSequence refreshingLabel) {
-        mRefreshingLabel = refreshingLabel;
-    }
-
-    public void setReleaseLabel(CharSequence releaseLabel) {
-        mReleaseLabel = releaseLabel;
-    }
-
-    public void setTextTypeface(Typeface tf) {
-        mHeaderText.setTypeface(tf);
-    }
-
-    public final void showInvisibleViews() {
-        if (View.INVISIBLE == mHeaderText.getVisibility()) {
-            mHeaderText.setVisibility(View.VISIBLE);
-        }
-        if (View.INVISIBLE == mHeaderProgress.getVisibility()) {
-            mHeaderProgress.setVisibility(View.VISIBLE);
-        }
-        if (View.INVISIBLE == mHeaderImage.getVisibility()) {
-            mHeaderImage.setVisibility(View.VISIBLE);
-        }
-        if (View.INVISIBLE == mSubHeaderText.getVisibility()) {
-            mSubHeaderText.setVisibility(View.VISIBLE);
-        }
-    }
 
     /**
      * Callbacks for derivative Layouts
@@ -361,33 +339,6 @@ public class LoadingLayout extends ILoadingLayout {
         }
     }
 
-    protected void onPullImpl(float scaleOfLayout) {
-
-    }
-
-    protected void pullToRefreshImpl() {
-        // Only start reset Animation, we've previously show the rotate anim
-        if (mRotateAnimation == mHeaderImage.getAnimation()) {
-            mHeaderImage.startAnimation(mResetRotateAnimation);
-        }
-    }
-
-    protected void refreshingImpl() {
-        mHeaderImage.clearAnimation();
-        mHeaderImage.setVisibility(View.INVISIBLE);
-        mHeaderProgress.setVisibility(View.VISIBLE);
-    }
-
-    protected void releaseToRefreshImpl() {
-        mHeaderImage.startAnimation(mRotateAnimation);
-    }
-
-    protected void resetImpl() {
-        mHeaderImage.clearAnimation();
-        mHeaderProgress.setVisibility(View.GONE);
-        mHeaderImage.setVisibility(View.VISIBLE);
-    }
-
     private float getDrawableRotationAngle() {
         float angle = 0f;
         switch (mMode) {
@@ -400,19 +351,6 @@ public class LoadingLayout extends ILoadingLayout {
                 break;
         }
         return angle;
-    }
-
-    private void setSubHeaderText(CharSequence label) {
-        if (null != mSubHeaderText) {
-            if (TextUtils.isEmpty(label)) {
-                mSubHeaderText.setVisibility(View.GONE);
-            } else {
-                mSubHeaderText.setText(label);
-                if (View.GONE == mSubHeaderText.getVisibility()) {
-                    mSubHeaderText.setVisibility(View.VISIBLE);
-                }
-            }
-        }
     }
 
     private void setSubTextAppearance(int value) {
