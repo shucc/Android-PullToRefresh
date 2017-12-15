@@ -1,57 +1,35 @@
 package com.handmark.pulltorefresh.library;
 
-import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
-public interface ILoadingLayout {
+/**
+ * Created by shucc on 17/12/15.
+ * cc@cchao.org
+ */
+public abstract class ILoadingLayout extends FrameLayout {
 
-    /**
-     * Set the Last Updated Text. This displayed under the main label when
-     * Pulling
-     *
-     * @param label - Label to set
-     */
-    void setLastUpdatedLabel(CharSequence label);
+    public ILoadingLayout(@NonNull Context context) {
+        super(context);
+    }
 
-    /**
-     * Set the drawable used in the loading layout. This is the same as calling
-     * <code>setLoadingDrawable(drawable, Mode.BOTH)</code>
-     *
-     * @param drawable - Drawable to display
-     */
-    void setLoadingDrawable(Drawable drawable);
+    public final void setHeight(int height) {
+        ViewGroup.LayoutParams lp = getLayoutParams();
+        lp.height = height;
+        requestLayout();
+    }
 
-    /**
-     * Set Text to show when the Widget is being Pulled
-     * <code>setPullLabel(releaseLabel, Mode.BOTH)</code>
-     *
-     * @param pullLabel - CharSequence to display
-     */
-    void setPullLabel(CharSequence pullLabel);
+    abstract public int getContentSize();
 
-    /**
-     * Set Text to show when the Widget is refreshing
-     * <code>setRefreshingLabel(releaseLabel, Mode.BOTH)</code>
-     *
-     * @param refreshingLabel - CharSequence to display
-     */
-    void setRefreshingLabel(CharSequence refreshingLabel);
+    abstract public void pullToRefresh();
 
-    /**
-     * Set Text to show when the Widget is being pulled, and will refresh when
-     * released. This is the same as calling
-     * <code>setReleaseLabel(releaseLabel, Mode.BOTH)</code>
-     *
-     * @param releaseLabel - CharSequence to display
-     */
-    void setReleaseLabel(CharSequence releaseLabel);
+    abstract public void refreshing();
 
-    /**
-     * Set's the Sets the typeface and style in which the text should be
-     * displayed. Please see
-     * {@link android.widget.TextView#setTypeface(Typeface)
-     * TextView#setTypeface(Typeface)}.
-     */
-    void setTextTypeface(Typeface tf);
+    abstract public void releaseToRefresh();
 
+    abstract public void reset();
+
+    abstract public void onPull(float scaleOfLayout);
 }

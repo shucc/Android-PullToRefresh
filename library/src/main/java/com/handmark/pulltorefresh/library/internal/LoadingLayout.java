@@ -49,7 +49,7 @@ import java.util.Date;
 import java.util.Locale;
 
 @SuppressLint("ViewConstructor")
-public class LoadingLayout extends FrameLayout implements ILoadingLayout {
+public class LoadingLayout extends ILoadingLayout {
 
     static final String LOG_TAG = "PullToRefresh-LoadingLayout";
 
@@ -196,43 +196,19 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
         reset();
     }
 
-    public final void setHeight(int height) {
-        ViewGroup.LayoutParams lp = getLayoutParams();
-        lp.height = height;
-        requestLayout();
-    }
-
-    public final void setWidth(int width) {
-        ViewGroup.LayoutParams lp = getLayoutParams();
-        lp.width = width;
-        requestLayout();
-    }
-
-    public final int getContentSize() {
+    @Override
+    public int getContentSize() {
         return mInnerLayout.getHeight();
     }
 
-    public final void hideAllViews() {
-        if (View.VISIBLE == mHeaderText.getVisibility()) {
-            mHeaderText.setVisibility(View.INVISIBLE);
-        }
-        if (View.VISIBLE == mHeaderProgress.getVisibility()) {
-            mHeaderProgress.setVisibility(View.INVISIBLE);
-        }
-        if (View.VISIBLE == mHeaderImage.getVisibility()) {
-            mHeaderImage.setVisibility(View.INVISIBLE);
-        }
-        if (View.VISIBLE == mSubHeaderText.getVisibility()) {
-            mSubHeaderText.setVisibility(View.INVISIBLE);
-        }
-    }
-
+    @Override
     public final void onPull(float scaleOfLayout) {
         if (!mUseIntrinsicAnimation) {
             onPullImpl(scaleOfLayout);
         }
     }
 
+    @Override
     public final void pullToRefresh() {
         if (null != mHeaderText) {
             mHeaderText.setText(mPullLabel);
@@ -250,6 +226,7 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
         pullToRefreshImpl();
     }
 
+    @Override
     public final void refreshing() {
         if (null != mHeaderText) {
             mHeaderText.setText(mRefreshingLabel);
@@ -273,6 +250,7 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
         }
     }
 
+    @Override
     public final void releaseToRefresh() {
         if (null != mHeaderText) {
             mHeaderText.setText(mReleaseLabel);
@@ -281,6 +259,7 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
         releaseToRefreshImpl();
     }
 
+    @Override
     public final void reset() {
         if (null != mHeaderText) {
             mHeaderText.setText(mRefreshComplete);
@@ -292,11 +271,6 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
             // Now call the callback
             resetImpl();
         }
-    }
-
-    @Override
-    public void setLastUpdatedLabel(CharSequence label) {
-        setSubHeaderText(label);
     }
 
     private String getLastUpdateTime() {
@@ -334,7 +308,6 @@ public class LoadingLayout extends FrameLayout implements ILoadingLayout {
         mReleaseLabel = releaseLabel;
     }
 
-    @Override
     public void setTextTypeface(Typeface tf) {
         mHeaderText.setTypeface(tf);
     }
