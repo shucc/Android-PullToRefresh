@@ -32,14 +32,9 @@ import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
-import com.handmark.pulltorefresh.library.internal.FlipLoadingLayout;
 import com.handmark.pulltorefresh.library.internal.LoadingLayout;
 
 public abstract class PullToRefreshBase<T extends View> extends LinearLayout implements IPullToRefresh<T> {
-
-    // ===========================================================
-    // Constants
-    // ===========================================================
 
     static final boolean DEBUG = BuildConfig.DEBUG;
 
@@ -550,7 +545,7 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout imp
     }
 
     protected LoadingLayout createLoadingLayout(Context context, Mode mode, TypedArray attrs) {
-        LoadingLayout layout = new FlipLoadingLayout(context, mode, attrs);
+        LoadingLayout layout = new LoadingLayout(context, mode, attrs);
         layout.setVisibility(View.INVISIBLE);
         return layout;
     }
