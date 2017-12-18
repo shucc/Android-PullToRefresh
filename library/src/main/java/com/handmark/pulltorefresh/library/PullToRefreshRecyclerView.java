@@ -42,7 +42,7 @@ public class PullToRefreshRecyclerView extends PullToRefreshBase<RecyclerView> {
     protected RecyclerView createRefreshableView(Context context, AttributeSet attrs) {
         RecyclerView recyclerView;
         recyclerView = new RecyclerView(context, attrs);
-        recyclerView.setId(R.id.recyclerview);
+        recyclerView.setId(R.id.default_pull_to_recycler_view);
         return recyclerView;
     }
 

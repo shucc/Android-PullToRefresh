@@ -38,7 +38,7 @@ public class PullToRefreshNestedScrollView extends PullToRefreshBase<NestedScrol
     protected NestedScrollView createRefreshableView(Context context, AttributeSet attrs) {
         NestedScrollView scrollView;
         scrollView = new NestedScrollView(context, attrs);
-        scrollView.setId(R.id.scrollview);
+        scrollView.setId(R.id.default_pull_to_scroll_view);
         return scrollView;
     }
 
