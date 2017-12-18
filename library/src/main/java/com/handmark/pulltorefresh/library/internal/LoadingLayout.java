@@ -56,21 +56,15 @@ public class LoadingLayout extends ILoadingLayout {
     private final static String KEY_LAST_UPDATE_TIME_SP = "ptr_last_update";
     private final static String KEY_LAST_UPDATE_TIME = "last_update_time";
 
-    private final int FLIP_ANIMATION_DURATION = 150;
-
-    private final Interpolator ANIMATION_INTERPOLATOR = new LinearInterpolator();
-
     private SimpleDateFormat mDataFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
 
     private RelativeLayout mInnerLayout;
-
-    private final ImageView mHeaderImage;
-    private final ProgressBar mHeaderProgress;
+    private ImageView mHeaderImage;
+    private ProgressBar mHeaderProgress;
+    private TextView mHeaderText;
+    private TextView mSubHeaderText;
 
     private boolean mUseIntrinsicAnimation;
-
-    private final TextView mHeaderText;
-    private final TextView mSubHeaderText;
 
     private final Mode mMode;
 
@@ -80,8 +74,6 @@ public class LoadingLayout extends ILoadingLayout {
     private CharSequence mRefreshComplete;
 
     private boolean showHeaderSub = false;
-
-    private boolean showLoading = true;
 
     private long mLastUpdateTime = -1;
 
@@ -102,14 +94,14 @@ public class LoadingLayout extends ILoadingLayout {
         final int rotateAngle = mode == Mode.PULL_FROM_START ? -180 : 180;
         mRotateAnimation = new RotateAnimation(0, rotateAngle, Animation.RELATIVE_TO_SELF, 0.5f,
                 Animation.RELATIVE_TO_SELF, 0.5f);
-        mRotateAnimation.setInterpolator(ANIMATION_INTERPOLATOR);
-        mRotateAnimation.setDuration(FLIP_ANIMATION_DURATION);
+        mRotateAnimation.setInterpolator(new LinearInterpolator());
+        mRotateAnimation.setDuration(150);
         mRotateAnimation.setFillAfter(true);
 
         mResetRotateAnimation = new RotateAnimation(rotateAngle, 0, Animation.RELATIVE_TO_SELF, 0.5f,
                 Animation.RELATIVE_TO_SELF, 0.5f);
-        mResetRotateAnimation.setInterpolator(ANIMATION_INTERPOLATOR);
-        mResetRotateAnimation.setDuration(FLIP_ANIMATION_DURATION);
+        mResetRotateAnimation.setInterpolator(new LinearInterpolator());
+        mResetRotateAnimation.setDuration(150);
         mResetRotateAnimation.setFillAfter(true);
 
         FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) mInnerLayout.getLayoutParams();
@@ -166,16 +158,6 @@ public class LoadingLayout extends ILoadingLayout {
         }
         if (attrs.hasValue(R.styleable.PullToRefresh_ptrShowLastUpdateTime)) {
             showHeaderSub = attrs.getBoolean(R.styleable.PullToRefresh_ptrShowLastUpdateTime, false);
-        }
-
-        if (attrs.hasValue(R.styleable.PullToRefresh_ptrShowLoading)) {
-            showLoading = attrs.getBoolean(R.styleable.PullToRefresh_ptrShowLoading, true);
-        }
-
-        if (showLoading) {
-            mInnerLayout.setVisibility(VISIBLE);
-        } else {
-            mInnerLayout.setVisibility(GONE);
         }
 
         // Try and get defined drawable from Attrs

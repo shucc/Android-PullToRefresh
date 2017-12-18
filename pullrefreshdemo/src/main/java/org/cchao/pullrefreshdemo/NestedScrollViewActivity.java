@@ -11,7 +11,8 @@ import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
 
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
-import com.handmark.pulltorefresh.library.PullToRefreshNestedScrollView;
+
+import org.cchao.pullrefreshdemo.widget.CustomPullToRefreshNestedScrollView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.List;
  */
 public class NestedScrollViewActivity extends AppCompatActivity {
 
-    private PullToRefreshNestedScrollView prScrollView;
+    private CustomPullToRefreshNestedScrollView prScrollView;
     private RecyclerView rvData;
 
     private List<String> data;
