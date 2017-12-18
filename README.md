@@ -18,7 +18,7 @@ allprojects {
 ```groovy
 dependencies {
     implementation 'com.android.support:recyclerview-v7:latest.version'
-    implementation ('com.github.shucc:Android-PullToRefresh:v0.1') {
+    implementation ('com.github.shucc:Android-PullToRefresh:v3.0') {
         exclude group: 'com.android.support', module: 'recyclerview-v7'
     }
 }
