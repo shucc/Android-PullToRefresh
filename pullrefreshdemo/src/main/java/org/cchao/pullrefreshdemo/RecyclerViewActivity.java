@@ -42,6 +42,7 @@ public class RecyclerViewActivity extends AppCompatActivity {
 
         data = new ArrayList<>();
 
+        prRecycler.setMode(PullToRefreshBase.Mode.BOTH);
         prRecycler.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener2<RecyclerView>() {
             @Override
             public void onPullDownToRefresh(PullToRefreshBase<RecyclerView> refreshView) {

@@ -155,6 +155,12 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
         return mScrollingWhileRefreshingEnabled;
     }
 
+    public final void onRefreshComplete() {
+        if (isRefreshing()) {
+            setState(State.RESET);
+        }
+    }
+
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
 
@@ -218,12 +224,6 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
         }
 
         return mIsBeingDragged;
-    }
-
-    public final void onRefreshComplete() {
-        if (isRefreshing()) {
-            setState(State.RESET);
-        }
     }
 
     @Override
@@ -1073,7 +1073,7 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
         }
 
         static Mode getDefault() {
-            return PULL_FROM_START;
+            return DISABLED;
         }
 
         private int mIntValue;

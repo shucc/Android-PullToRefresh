@@ -46,6 +46,7 @@ public class NestedScrollViewActivity extends AppCompatActivity {
 
         data = new ArrayList<>();
 
+        prScrollView.setMode(PullToRefreshBase.Mode.BOTH);
         prScrollView.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener2<NestedScrollView>() {
             @Override
             public void onPullDownToRefresh(PullToRefreshBase<NestedScrollView> refreshView) {
