@@ -24,7 +24,6 @@ import android.graphics.Matrix;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -178,13 +177,11 @@ public class LoadingLayout extends ILoadingLayout {
 
     @Override
     public int getContentSize() {
-        Log.d(TAG, "getContentSize: ");
         return mInnerLayout.getHeight();
     }
 
     @Override
     public final void onPull(float scaleOfLayout) {
-        Log.d(TAG, "onPull: " + scaleOfLayout);
         if (!mUseIntrinsicAnimation) {
 
         }
@@ -192,7 +189,6 @@ public class LoadingLayout extends ILoadingLayout {
 
     @Override
     public final void pullToRefresh() {
-        Log.d(TAG, "pullToRefresh: ");
         if (null != mHeaderText) {
             mHeaderText.setText(mPullLabel);
         }
@@ -212,7 +208,6 @@ public class LoadingLayout extends ILoadingLayout {
 
     @Override
     public final void refreshing() {
-        Log.d(TAG, "refreshing: ");
         if (null != mHeaderText) {
             mHeaderText.setText(mRefreshingLabel);
         }
@@ -239,7 +234,6 @@ public class LoadingLayout extends ILoadingLayout {
 
     @Override
     public final void releaseToRefresh() {
-        Log.d(TAG, "releaseToRefresh: ");
         if (null != mHeaderText) {
             mHeaderText.setText(mReleaseLabel);
         }
@@ -249,7 +243,6 @@ public class LoadingLayout extends ILoadingLayout {
 
     @Override
     public final void reset() {
-        Log.d(TAG, "reset: ");
         if (null != mHeaderText) {
             mHeaderText.setText(mRefreshComplete);
         }

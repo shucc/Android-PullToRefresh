@@ -22,7 +22,7 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase.State;
 
 public final class OverScrollHelper {
 
-    static final float DEFAULT_OVERSCROLL_SCALE = 1f;
+    private static final float DEFAULT_OVERSCROLL_SCALE = 1f;
 
     /**
      * Helper method for Overscrolling that encapsulates all of the necessary

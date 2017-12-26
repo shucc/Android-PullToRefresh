@@ -2,6 +2,7 @@ package org.cchao.pullrefreshdemo.widget;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.FrameLayout;
 
@@ -14,6 +15,8 @@ import org.cchao.pullrefreshdemo.R;
  * cc@cchao.org
  */
 public class CustomLoadingLayout extends ILoadingLayout {
+
+    private final String TAG = getClass().getName();
 
     private FrameLayout flParent;
 
@@ -30,26 +33,26 @@ public class CustomLoadingLayout extends ILoadingLayout {
 
     @Override
     public void pullToRefresh() {
-
+        Log.d(TAG, "pullToRefresh: ");
     }
 
     @Override
     public void refreshing() {
-
+        Log.d(TAG, "refreshing: ");
     }
 
     @Override
     public void releaseToRefresh() {
-
+        Log.d(TAG, "releaseToRefresh: ");
     }
 
     @Override
     public void reset() {
-
+        Log.d(TAG, "reset: ");
     }
 
     @Override
     public void onPull(float scaleOfLayout) {
-
+        Log.d(TAG, "onPull: " + scaleOfLayout);
     }
 }

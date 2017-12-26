@@ -33,15 +33,18 @@ import android.widget.LinearLayout;
 
 import com.handmark.pulltorefresh.library.internal.LoadingLayout;
 
+import static com.handmark.pulltorefresh.library.PullToRefreshBase.Mode.PULL_FROM_END;
+import static com.handmark.pulltorefresh.library.PullToRefreshBase.Mode.PULL_FROM_START;
+
 public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
 
     private final boolean USE_HW_LAYERS = false;
 
     private final float FRICTION = 2.0f;
 
-    public static final int SMOOTH_SCROLL_DURATION_MS = 200;
-    public static final int SMOOTH_SCROLL_LONG_DURATION_MS = 325;
-    static final int DEMO_SCROLL_INTERVAL = 225;
+    private final int SMOOTH_SCROLL_DURATION_MS = 200;
+    private final int SMOOTH_SCROLL_LONG_DURATION_MS = 325;
+    private final int DEMO_SCROLL_INTERVAL = 225;
 
     private final String STATE_STATE = "ptr_state";
     private final String STATE_MODE = "ptr_mode";
@@ -51,8 +54,8 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
     private final String STATE_SUPER = "ptr_super";
 
     private int mTouchSlop;
-    private float mLastMotionX, mLastMotionY;
-    private float mInitialMotionX, mInitialMotionY;
+    private float mLastMotionY;
+    private float mInitialMotionY;
 
     private boolean mIsBeingDragged = false;
     private State mState = State.RESET;
@@ -163,50 +166,41 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
-
         if (!isPullToRefreshEnabled()) {
             return false;
         }
-
         final int action = event.getAction();
-
         if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
             mIsBeingDragged = false;
             return false;
         }
-
         if (action != MotionEvent.ACTION_DOWN && mIsBeingDragged) {
             return true;
         }
-
         switch (action) {
             case MotionEvent.ACTION_MOVE: {
-                // If we're refreshing, and the flag is set. Eat all MOVE events
+                //若正在刷新中且设置了刷新中不可滑动
                 if (!mScrollingWhileRefreshingEnabled && isRefreshing()) {
                     return true;
                 }
-
                 if (isReadyForPull()) {
-                    final float y = event.getY(), x = event.getX();
-                    final float diff, oppositeDiff, absDiff;
+                    final float y = event.getY();
+                    final float diff;
+                    final float absDiff;
                     diff = y - mLastMotionY;
-                    oppositeDiff = x - mLastMotionX;
                     absDiff = Math.abs(diff);
-
-                    if (absDiff > mTouchSlop && (!mFilterTouchEvents || absDiff > Math.abs(oppositeDiff))) {
+                    if (absDiff > mTouchSlop) {
                         if (mMode.showHeaderLoadingLayout() && diff >= 1f && isReadyForPullStart()) {
                             mLastMotionY = y;
-                            mLastMotionX = x;
                             mIsBeingDragged = true;
                             if (mMode == Mode.BOTH) {
                                 mCurrentMode = Mode.PULL_FROM_START;
                             }
                         } else if (mMode.showFooterLoadingLayout() && diff <= -1f && isReadyForPullEnd()) {
                             mLastMotionY = y;
-                            mLastMotionX = x;
                             mIsBeingDragged = true;
                             if (mMode == Mode.BOTH) {
-                                mCurrentMode = Mode.PULL_FROM_END;
+                                mCurrentMode = PULL_FROM_END;
                             }
                         }
                     }
@@ -216,7 +210,6 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
             case MotionEvent.ACTION_DOWN: {
                 if (isReadyForPull()) {
                     mLastMotionY = mInitialMotionY = event.getY();
-                    mLastMotionX = mInitialMotionX = event.getX();
                     mIsBeingDragged = false;
                 }
                 break;
@@ -228,25 +221,20 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
 
     @Override
     public final boolean onTouchEvent(MotionEvent event) {
-
         if (!isPullToRefreshEnabled()) {
             return false;
         }
-
-        // If we're refreshing, and the flag is set. Eat the event
+        //若正在刷新中且设置了刷新中不可滑动
         if (!mScrollingWhileRefreshingEnabled && isRefreshing()) {
             return true;
         }
-
         if (event.getAction() == MotionEvent.ACTION_DOWN && event.getEdgeFlags() != 0) {
             return false;
         }
-
         switch (event.getAction()) {
             case MotionEvent.ACTION_MOVE: {
                 if (mIsBeingDragged) {
                     mLastMotionY = event.getY();
-                    mLastMotionX = event.getX();
                     pullEvent();
                     return true;
                 }
@@ -255,7 +243,6 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
             case MotionEvent.ACTION_DOWN: {
                 if (isReadyForPull()) {
                     mLastMotionY = mInitialMotionY = event.getY();
-                    mLastMotionX = mInitialMotionX = event.getX();
                     return true;
                 }
                 break;
@@ -270,13 +257,11 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
                         setState(State.REFRESHING, true);
                         return true;
                     }
-
                     // If we're already refreshing, just scroll back to the top
                     if (isRefreshing()) {
                         smoothScrollTo(0);
                         return true;
                     }
-
                     // If we haven't returned by here, then we're not in a state
                     // to pull, so just reset
                     setState(State.RESET);
@@ -423,7 +408,7 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
      * @return
      */
     public ILoadingLayout createFooterLoadingLayout(Context context, TypedArray attrs) {
-        return new LoadingLayout(context, Mode.PULL_FROM_END, attrs);
+        return new LoadingLayout(context, PULL_FROM_END, attrs);
     }
 
     /**
@@ -544,10 +529,10 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
      * @param doScroll - Whether the UI should scroll for this event.
      */
     protected void onRefreshing(final boolean doScroll) {
-        if (mMode.showHeaderLoadingLayout()) {
+        if (mCurrentMode == PULL_FROM_START && mMode.showHeaderLoadingLayout()) {
             mHeaderLayout.refreshing();
         }
-        if (mMode.showFooterLoadingLayout()) {
+        if (mCurrentMode == PULL_FROM_END && mMode.showFooterLoadingLayout()) {
             mFooterLayout.refreshing();
         }
 
@@ -608,8 +593,12 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
         mLayoutVisibilityChangesEnabled = true;
 
         // Always reset both layouts, just in case...
-        mHeaderLayout.reset();
-        mFooterLayout.reset();
+        if (mCurrentMode == PULL_FROM_END) {
+            mFooterLayout.reset();
+        }
+        if (mCurrentMode == PULL_FROM_START) {
+            mHeaderLayout.reset();
+        }
 
         smoothScrollTo(0);
     }
@@ -748,8 +737,7 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
     }
 
     /**
-     * Smooth Scroll to position using the default duration of
-     * {@value #SMOOTH_SCROLL_DURATION_MS} ms.
+     * Smooth Scroll to position using the default duration of ms.
      *
      * @param scrollValue - Position to scroll to
      */
@@ -758,8 +746,7 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
     }
 
     /**
-     * Smooth Scroll to position using the default duration of
-     * {@value #SMOOTH_SCROLL_DURATION_MS} ms.
+     * Smooth Scroll to position using the default duration of ms.
      *
      * @param scrollValue - Position to scroll to
      * @param listener    - Listener for scroll
@@ -769,8 +756,7 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
     }
 
     /**
-     * Smooth Scroll to position using the longer default duration of
-     * {@value #SMOOTH_SCROLL_LONG_DURATION_MS} ms.
+     * Smooth Scroll to position using the longer default duration of ms.
      *
      * @param scrollValue - Position to scroll to
      */
@@ -830,7 +816,7 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
         } else if (null != mOnRefreshListener2) {
             if (mCurrentMode == Mode.PULL_FROM_START) {
                 mOnRefreshListener2.onPullDownToRefresh(this);
-            } else if (mCurrentMode == Mode.PULL_FROM_END) {
+            } else if (mCurrentMode == PULL_FROM_END) {
                 mOnRefreshListener2.onPullUpToRefresh(this);
             }
         }
@@ -919,7 +905,8 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
     private void pullEvent() {
         final int newScrollValue;
         final int itemDimension;
-        final float initialMotionValue, lastMotionValue;
+        final float initialMotionValue;
+        final float lastMotionValue;
         initialMotionValue = mInitialMotionY;
         lastMotionValue = mLastMotionY;
 
@@ -1051,7 +1038,7 @@ public abstract class PullToRefreshBase<T extends View> extends LinearLayout {
         /**
          * @deprecated Use {@link #PULL_FROM_END} from now on.
          */
-        public static Mode PULL_UP_TO_REFRESH = Mode.PULL_FROM_END;
+        public static Mode PULL_UP_TO_REFRESH = PULL_FROM_END;
 
         /**
          * Maps an int to a specific mode. This is needed when saving state, or
