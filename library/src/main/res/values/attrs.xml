@@ -19,6 +19,16 @@
 
         <attr name="ptrShowLoading" format="reference|boolean" />
 
+        <attr name="ptrHeaderPullLabel" format="string" />
+        <attr name="ptrHeaderRefreshingLabel" format="string" />
+        <attr name="ptrHeaderReleaseLabel" format="string" />
+        <attr name="ptrHeaderRefreshComplete" format="string" />
+
+        <attr name="ptrBottomPullLabel" format="string" />
+        <attr name="ptrBottomRefreshingLabel" format="string" />
+        <attr name="ptrBottomReleaseLabel" format="string" />
+        <attr name="ptrBottomRefreshComplete" format="string" />
+
         <!-- Mode of Pull-to-Refresh that should be used -->
         <attr name="ptrMode">
             <flag name="disabled" value="0x0" />

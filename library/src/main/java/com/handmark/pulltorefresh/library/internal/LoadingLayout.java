@@ -66,10 +66,15 @@ public class LoadingLayout extends ILoadingLayout {
 
     private final Mode mMode;
 
-    private CharSequence mPullLabel;
-    private CharSequence mRefreshingLabel;
-    private CharSequence mReleaseLabel;
-    private CharSequence mRefreshComplete;
+    private CharSequence mHeaderPullLabel;
+    private CharSequence mHeaderRefreshingLabel;
+    private CharSequence mHeaderReleaseLabel;
+    private CharSequence mHeaderRefreshComplete;
+
+    private CharSequence mBottomPullLabel;
+    private CharSequence mBottomRefreshingLabel;
+    private CharSequence mBottomReleaseLabel;
+    private CharSequence mBottomRefreshComplete;
 
     private boolean showHeaderSub = false;
 
@@ -107,17 +112,41 @@ public class LoadingLayout extends ILoadingLayout {
         switch (mode) {
             case PULL_FROM_END:
                 lp.gravity = Gravity.TOP;
-                mPullLabel = context.getString(R.string.pull_to_refresh_from_bottom_pull_label);
-                mRefreshingLabel = context.getString(R.string.pull_to_refresh_from_bottom_refreshing_label);
-                mReleaseLabel = context.getString(R.string.pull_to_refresh_from_bottom_release_label);
-                mRefreshComplete = context.getString(R.string.pull_to_refresh_from_bottom_refresh_complete);
+                mBottomPullLabel = attrs.getString(R.styleable.PullToRefresh_ptrBottomPullLabel);
+                if (TextUtils.isEmpty(mBottomPullLabel)) {
+                    mBottomPullLabel = context.getString(R.string.pull_to_refresh_from_bottom_pull_label);
+                }
+                mBottomRefreshingLabel = attrs.getString(R.styleable.PullToRefresh_ptrBottomRefreshingLabel);
+                if (TextUtils.isEmpty(mBottomRefreshingLabel)) {
+                    mBottomRefreshingLabel = context.getString(R.string.pull_to_refresh_from_bottom_refreshing_label);
+                }
+                mBottomReleaseLabel = attrs.getString(R.styleable.PullToRefresh_ptrBottomReleaseLabel);
+                if (TextUtils.isEmpty(mBottomReleaseLabel)) {
+                    mBottomReleaseLabel = context.getString(R.string.pull_to_refresh_from_bottom_release_label);
+                }
+                mBottomRefreshComplete = attrs.getString(R.styleable.PullToRefresh_ptrBottomRefreshComplete);
+                if (TextUtils.isEmpty(mBottomRefreshComplete)) {
+                    mBottomRefreshComplete = context.getString(R.string.pull_to_refresh_from_bottom_refresh_complete);
+                }
                 break;
             case PULL_FROM_START:
                 lp.gravity = Gravity.BOTTOM;
-                mPullLabel = context.getString(R.string.pull_to_refresh_pull_label);
-                mRefreshingLabel = context.getString(R.string.pull_to_refresh_refreshing_label);
-                mReleaseLabel = context.getString(R.string.pull_to_refresh_release_label);
-                mRefreshComplete = context.getString(R.string.pull_to_refresh_refresh_complete);
+                mHeaderPullLabel = attrs.getString(R.styleable.PullToRefresh_ptrHeaderPullLabel);
+                if (TextUtils.isEmpty(mHeaderPullLabel)) {
+                    mHeaderPullLabel = context.getString(R.string.pull_to_refresh_pull_label);
+                }
+                mHeaderRefreshingLabel = attrs.getString(R.styleable.PullToRefresh_ptrHeaderRefreshingLabel);
+                if (TextUtils.isEmpty(mHeaderRefreshingLabel)) {
+                    mHeaderRefreshingLabel = context.getString(R.string.pull_to_refresh_refreshing_label);
+                }
+                mHeaderReleaseLabel = attrs.getString(R.styleable.PullToRefresh_ptrHeaderReleaseLabel);
+                if (TextUtils.isEmpty(mHeaderReleaseLabel)) {
+                    mHeaderReleaseLabel = context.getString(R.string.pull_to_refresh_release_label);
+                }
+                mHeaderRefreshComplete = attrs.getString(R.styleable.PullToRefresh_ptrHeaderRefreshComplete);
+                if (TextUtils.isEmpty(mHeaderRefreshComplete)) {
+                    mHeaderRefreshComplete = context.getString(R.string.pull_to_refresh_refresh_complete);
+                }
                 break;
             default:
                 break;
@@ -190,7 +219,7 @@ public class LoadingLayout extends ILoadingLayout {
     @Override
     public final void pullToRefresh() {
         if (null != mHeaderText) {
-            mHeaderText.setText(mPullLabel);
+            mHeaderText.setText(mMode == Mode.PULL_FROM_START ? mHeaderPullLabel : mBottomPullLabel);
         }
         if (showHeaderSub && mMode == Mode.PULL_FROM_START && null != mSubHeaderText) {
             String time = getLastUpdateTime();
@@ -209,7 +238,7 @@ public class LoadingLayout extends ILoadingLayout {
     @Override
     public final void refreshing() {
         if (null != mHeaderText) {
-            mHeaderText.setText(mRefreshingLabel);
+            mHeaderText.setText(mMode == Mode.PULL_FROM_START ? mHeaderRefreshingLabel : mBottomRefreshingLabel);
         }
 
         if (mUseIntrinsicAnimation) {
@@ -235,7 +264,7 @@ public class LoadingLayout extends ILoadingLayout {
     @Override
     public final void releaseToRefresh() {
         if (null != mHeaderText) {
-            mHeaderText.setText(mReleaseLabel);
+            mHeaderText.setText(mMode == Mode.PULL_FROM_START ? mHeaderReleaseLabel : mBottomReleaseLabel);
         }
         // Now call the callback
         mHeaderImage.startAnimation(mRotateAnimation);
@@ -244,7 +273,7 @@ public class LoadingLayout extends ILoadingLayout {
     @Override
     public final void reset() {
         if (null != mHeaderText) {
-            mHeaderText.setText(mRefreshComplete);
+            mHeaderText.setText(mMode == Mode.PULL_FROM_START ? mHeaderRefreshComplete : mBottomRefreshComplete);
         }
         //mHeaderImage.setVisibility(View.VISIBLE);
         if (mUseIntrinsicAnimation) {
