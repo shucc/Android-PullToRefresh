@@ -18,4 +18,11 @@
         android:text="To RecyclerViewActivity"
         android:textAllCaps="false" />
 
+    <android.support.v7.widget.AppCompatButton
+        android:id="@+id/btn_three"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="To DemoActivity"
+        android:textAllCaps="false" />
+
 </LinearLayout>

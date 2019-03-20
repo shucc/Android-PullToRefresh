@@ -12,5 +12,6 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.btn_one).setOnClickListener(view -> NestedScrollViewActivity.launch(this));
         findViewById(R.id.btn_two).setOnClickListener(view -> RecyclerViewActivity.launch(this));
+        findViewById(R.id.btn_three).setOnClickListener(v -> DemoActivity.launch(this));
     }
 }
