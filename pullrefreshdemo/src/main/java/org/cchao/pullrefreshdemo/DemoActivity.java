@@ -7,9 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import com.handmark.pulltorefresh.library.PullToRefreshBase;
-import com.handmark.pulltorefresh.library.PullToRefreshNestedScrollView;
-
 import org.cchao.pullrefreshdemo.adapter.DemoDataAdapter;
 import org.cchao.pullrefreshdemo.model.DataModel;
 import org.cchao.pullrefreshdemo.model.FoodDetailModel;
@@ -20,7 +17,6 @@ import java.util.List;
 
 public class DemoActivity extends AppCompatActivity {
 
-    private PullToRefreshNestedScrollView prScroll;
     private RecyclerView rvData;
 
     private List<DataModel> data;
@@ -36,16 +32,11 @@ public class DemoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_demo);
-        prScroll = findViewById(R.id.pr_scroll);
         rvData = findViewById(R.id.rv_data);
 
         data = new ArrayList<>();
-        prScroll.setMode(PullToRefreshBase.Mode.PULL_FROM_START);
-        prScroll.setOnRefreshListener(refreshView -> {
-            getData();
-        });
         showData();
-        prScroll.postDelayed(() -> prScroll.setRefreshing(), 50);
+        rvData.postDelayed(this::getData, 50);
     }
 
     private void getData() {
@@ -89,7 +80,6 @@ public class DemoActivity extends AppCompatActivity {
         data.clear();
         data.addAll(temp);
         showData();
-        prScroll.postDelayed(() -> prScroll.onRefreshComplete(), 1000);
     }
 
     private void showData() {
